@@ -3,6 +3,7 @@ import mongoPlugin from './plugins/mongo';
 import jwtPlugin from './plugins/jwt';
 import routes from './routes/routes';
 import swaggerPlugin from './plugins/swagger';
+import corsPlugin from './plugins/cors';
 import repository from './plugins/repository';
 
 const fastify: FastifyInstance = Fastify({
@@ -11,6 +12,7 @@ const fastify: FastifyInstance = Fastify({
 
 const start = async () => {
   try {
+    await fastify.register(corsPlugin)
     await fastify.register(swaggerPlugin)
     await fastify.register(jwtPlugin)
     await fastify.register(mongoPlugin)
