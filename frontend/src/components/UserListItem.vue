@@ -5,24 +5,17 @@
         </div>
         <div class="ml-5 d-flex flex-column">
             <div> {{ user.firstName }} {{ user.lastName }} </div>
-            <div class="text-muted"> {{user.email }} - {{ user.birthDate }}</div>
+            <div class="text-muted"> {{ user.email }} - {{ formattedBirthDate }}</div>
         </div>
         <div class="ml-auto d-flex align-items-center">
-            <span class="icon-edit text-primary" 
-                  style="cursor: pointer;"
-                  @click="toggleEdit"
-            >
-                <i v-if ="!edit" class="bi bi-pencil-fill" style="font-size:32px"></i>
+            <span class="icon-edit text-primary" style="cursor: pointer;" @click="toggleEdit">
+                <i v-if="!edit" class="bi bi-pencil-fill" style="font-size:32px"></i>
                 <i v-else class="bi bi-x-circle" style="font-size:32px"></i>
             </span>
         </div>
     </div>
     <div v-if="edit">
-        <UserForm :user="user" 
-                  @cancel="onCancel"
-                  @saved="onSaved"
-                  @deleted="onDeleted"  
-        />
+        <UserForm :user="user" @cancel="onCancel" @saved="onSaved" @deleted="onDeleted" />
     </div>
 </template>
 
@@ -47,6 +40,16 @@ export default defineComponent({
         return {
             edit: false,
         }
+    },
+    computed: {
+        formattedBirthDate() {
+            const date = new Date(this.user.birthDate);
+            return date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+            });
+        },
     },
     methods: {
         toggleEdit() {
