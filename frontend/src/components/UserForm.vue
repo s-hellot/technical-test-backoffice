@@ -56,7 +56,9 @@
                     :class="{ 'is-invalid': v$.newUser.birthDate.$error }"
                 />
                 <div v-if="v$.newUser.birthDate.$error" class="invalid-feedback">
-                    La date de naissance est requise.
+                    <div v-if="v$.newUser.birthDate.$errors[0]?.$message">
+                        {{ v$.newUser.birthDate.$errors[0]?.$message }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -64,7 +66,9 @@
         <div class="d-flex">
             <div class="mb-3 flex-grow-1">
                 <label for="password" class="form-label">Nouveau mot de passe</label>
-                <div class="d-flex">
+                <div class="d-flex"
+                    :class="{ 'is-invalid': v$.newUser.password.$error }" 
+                >
                     <input 
                         id="password" 
                         v-model="newUser.password" 
@@ -80,9 +84,9 @@
                     >
                         <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                     </button>
-                    <div v-if="v$.newUser.password.$error" class="invalid-feedback">
-                        Veuillez renseigner un mot de passe d'au moins 6 caractères.
-                    </div>
+                </div>
+                <div v-if="v$.newUser.password.$error" class="invalid-feedback">
+                    Veuillez renseigner un mot de passe d'au moins 6 caractères.
                 </div>
             </div>
         </div>
@@ -159,13 +163,13 @@ export default defineComponent({
                 lastName: { required },
                 email: { required, email },
                 birthDate: { 
-                    required, 
+                    required: helpers.withMessage('La date de naissance est requise.', required), 
                     isValidDate: helpers.withMessage('Date invalide', (value: string) => {
                         const date = new Date(value)
                         const now = new Date()
                         const min = new Date('1900-01-01')
                         return date >= min && date <= now
-                    }) 
+                    }),
                 },
                 password: this.edit
                     ? { minLength: minLength(6) }
