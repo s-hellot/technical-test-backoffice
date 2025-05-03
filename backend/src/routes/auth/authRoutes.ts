@@ -14,7 +14,7 @@ async function routes (fastify: FastifyInstance) {
             const { email, password } = request.body;
             const user = await fastify.userRepository.getByEmail(email)
             if (user && await comparePassword(password, user.password)) {
-                const token = fastify.jwt.sign({ email });
+                const token = fastify.jwt.sign({ email }, { expiresIn: "1h" });
                 return { token };
             } else {
                 reply.code(401).send({ message: 'Invalid password' });

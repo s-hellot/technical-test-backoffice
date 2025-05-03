@@ -5,7 +5,7 @@ export interface User {
     firstName: string,
     lastName: string,
     email: string,
-    birthdate: string
+    birthDate: string
 }
 
 export const getUsers = () => api.get<Array<User>>('/users')
