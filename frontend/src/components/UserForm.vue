@@ -64,15 +64,22 @@
         <div class="d-flex">
             <div class="mb-3 flex-grow-1">
                 <label for="password" class="form-label">Nouveau mot de passe</label>
-                <div>
+                <div class="d-flex">
                     <input 
                         id="password" 
                         v-model="newUser.password" 
-                        type="password" 
+                        :type="showPassword ? 'text' : 'password'" 
                         class="form-control"
                         :class="{ 'is-invalid': v$.newUser.password.$error }" 
                         placeholder="Renseignez votre mot de passe" 
                     />
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary position-relative ml-3"
+                        @click="togglePassword"
+                    >
+                        <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                    </button>
                     <div v-if="v$.newUser.password.$error" class="invalid-feedback">
                         Veuillez renseigner un mot de passe d'au moins 6 caractères.
                     </div>
@@ -112,7 +119,7 @@ import type { NewUser, User } from '@/api/user';
 import useVuelidate from '@vuelidate/core'
 import { updateUser, createUser, deleteUser } from '../api/user'
 import type { AxiosResponse } from 'axios';
-import { required, email, minLength } from '@vuelidate/validators'
+import { required, email, minLength, helpers } from '@vuelidate/validators'
 import ConfirmButton from './ConfirmButton.vue';
 
 export default defineComponent({
@@ -141,7 +148,8 @@ export default defineComponent({
             } as NewUser,
             edit: false,
             loadingSave: false,
-            loadingDelete: false
+            loadingDelete: false,
+            showPassword: false
         };
     },
     validations() {
@@ -150,7 +158,15 @@ export default defineComponent({
                 firstName: { required },
                 lastName: { required },
                 email: { required, email },
-                birthDate: { required },
+                birthDate: { 
+                    required, 
+                    isValidDate: helpers.withMessage('Date invalide', (value: string) => {
+                        const date = new Date(value)
+                        const now = new Date()
+                        const min = new Date('1900-01-01')
+                        return date >= min && date <= now
+                    }) 
+                },
                 password: this.edit
                     ? { minLength: minLength(6) }
                     : { required, minLength: minLength(6) }
@@ -196,6 +212,9 @@ export default defineComponent({
             } finally {
                 this.loadingSave = false
             }
+        },
+        togglePassword() {
+            this.showPassword = !this.showPassword
         }
     },
 });

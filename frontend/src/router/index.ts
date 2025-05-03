@@ -4,8 +4,8 @@ import LoginPage from '../pages/LoginPage.vue'
 import UserListPage from '../pages/UserListPage.vue'
 
 const routes = [
-  { path: '/', component: LoginPage },
-  { path: '/users', component: UserListPage },
+  { path: '/', name: 'Login', component: LoginPage },
+  { path: '/users', name: 'Users', component: UserListPage },
 ]
 
 const router = createRouter({
@@ -13,4 +13,14 @@ const router = createRouter({
   routes,
 })
 
-export default router;
+router.beforeEach((to, from) => {
+  const token = localStorage.getItem('token')
+
+  if (!token && to.name !== 'Login') {
+    return { name: 'Login' }
+  } else if (token && to.name === 'Login') {
+    return { name: 'Users' }
+  }
+})
+
+export default router

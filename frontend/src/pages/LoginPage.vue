@@ -34,6 +34,12 @@
                 </div>
             </div>
 
+            <div class="mt-2 d-flex justify-content-center">
+                <div class="text-muted">
+                    Utilisez admin@admin.com / admin pour vous connecter.
+                </div>
+            </div>
+
             <div class="pt-4 d-flex">
                 <button class="btn btn-dark ml-auto" @click="onLogin"> Valider </button>
             </div>
