@@ -1,11 +1,11 @@
 <template>
-    <div class="input-group mb-3">
+    <div class="input-group">
         <span class="icon-container">
             <i class="bi bi-search"></i>
         </span>
         <input
             type="text" 
-            class="form-control rounded pb-2 pl-5 mr-5"
+            class="form-control rounded pb-2 pl-5 mr-2"
             :placeholder="placeholder" 
             :value="modelValue"
             @input="onInput"

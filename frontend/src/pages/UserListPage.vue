@@ -2,10 +2,27 @@
     <div class="d-flex flex-column m-5">
         <div class="title text-center text-white"> Liste des utilisateurs</div>
 
-        <SearchBar class="m-5" 
-            v-model="searchQuery" 
-            @input="searchUsers"
-        />
+        <div class="d-flex m-5 align-items-center">
+            <SearchBar class="flex-grow-1"
+                v-model="searchQuery" 
+                @update:model-value="searchUsers"
+            />
+            <div>
+                <SortBySelect 
+                    class="ml-3 flex-grow-1"
+                    v-model="sortBy" 
+                    @update:model-value="loadUsers"
+                />
+            </div>
+            <div>
+                <OrderToggle 
+                    class="ml-3 flex-grow-1"
+                    v-model="sortOrder" 
+                    @update:model-value="loadUsers"
+                />
+            </div>
+        </div>
+
         <div class="d-flex justify-content-center">
             <div class="spinner-border text-light" role="status"
                  :style="{ visibility: loadingUsers ? 'visible' : 'hidden' }"
@@ -48,17 +65,24 @@ import UserListItem from '@/components/UserListItem.vue';
 import SearchBar from '../components/SearchBar.vue';
 import { getUsers, type User } from '@/api/user';
 import UserForm from '@/components/UserForm.vue';
+import SortBySelect from '@/components/SortBySelect.vue';
+import OrderToggle from '@/components/OrderToggle.vue';
+import { type SortOrder, type SortBy } from '@/types/sort';
 
 export default {
     name: 'UserListPage',
     components: {
         SearchBar,
         UserListItem,
-        UserForm
+        UserForm,
+        SortBySelect,
+        OrderToggle
     },
     data() {
         return {
             searchQuery: '',
+            sortBy: 'lastName' as SortBy,
+            sortOrder: 'asc' as SortOrder,
             users: [] as User[],
             loadingUsers: false,
             searchTimeout: null as number | null,
@@ -75,7 +99,7 @@ export default {
         async loadUsers() {
             try {
                 this.loadingUsers = true
-                const response = await getUsers(this.searchQuery)
+                const response = await getUsers(this.searchQuery, this.sortBy, this.sortOrder)
                 this.users = response.data
             } finally {
                 this.loadingUsers = false
@@ -85,15 +109,12 @@ export default {
             this.users = this.users.map(u => u.id === user.id ? user : u);        
         },
         async searchUsers() {
-            console.log(this.searchQuery, this.searchTimeout)
-            if (this.searchQuery?.length > 2) {
-                if (this.searchTimeout) {
-                    clearTimeout(this.searchTimeout)
-                }
-                this.searchTimeout = setTimeout(async () => {
-                    await this.loadUsers()
-                }, 1500)
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout)
             }
+            this.searchTimeout = setTimeout(async () => {
+                await this.loadUsers()
+            }, 1500)
         },
         async onCreated() {
             this.displayNewForm = false

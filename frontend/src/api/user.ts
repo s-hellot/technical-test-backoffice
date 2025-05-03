@@ -1,3 +1,4 @@
+import type { SortBy, SortOrder } from '@/types/sort'
 import api from './index'
 
 export interface User {
@@ -12,7 +13,7 @@ export interface NewUser extends User {
     password?: string
 }
 
-export const getUsers = (search?: string, sortBy?: string, sortOrder?: 'asc' | 'desc') => {
+export const getUsers = (search?: string, sortBy?: SortBy, sortOrder?: SortOrder) => {
     return api.get<Array<User>>('/users', {
         params: {
             search,

@@ -71,7 +71,7 @@ export abstract class AbstractRepository<T extends Document> {
         sortBy:  Sort | string, 
         sortOrder: SortDirection = 'asc'
     ): Promise<Array<WithId<T>>> {
-        const result = await this.collection.find(filters).sort(sortBy, sortOrder).toArray();
+        const result = await this.collection.find(filters).collation({ locale: 'fr', strength: 1}).sort(sortBy, sortOrder).toArray();
         return this.mapArray(result);
     }
 }
