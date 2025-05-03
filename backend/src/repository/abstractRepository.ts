@@ -2,7 +2,7 @@ import { Collection, IndexSpecification, CreateIndexesOptions, Document } from '
 import { FastifyInstance } from "fastify";
 import {ObjectId, Filter, OptionalUnlessRequiredId, SortDirection, Sort} from 'mongodb';
 
-type WithId<T> = Omit<T, "_id"> & { id: string }
+export type WithId<T> = Omit<T, "_id"> & { id: string }
 
 export abstract class AbstractRepository<T extends Document> {
     abstract indexes: Array<[IndexSpecification, CreateIndexesOptions?]>;
@@ -44,10 +44,9 @@ export abstract class AbstractRepository<T extends Document> {
         }
     }
 
-    public async insert(document: OptionalUnlessRequiredId<T>): Promise<WithId<T>> {
+    public async insert(document: OptionalUnlessRequiredId<T>): Promise<WithId<T> | null> {
         const { insertedId } = await this.collection.insertOne(document)
-        const created = await this.get(insertedId.toString())
-        return this.mapMongoId(created);
+        return await this.get(insertedId.toString())
     }
 
     public async updateOne(id: string, document: Partial<T>): Promise<WithId<T> | null> {
@@ -55,9 +54,8 @@ export abstract class AbstractRepository<T extends Document> {
             { _id: new ObjectId(id) as Filter<T>}, 
             { $set: document }
         )
-        if (result.modifiedCount > 0) {
-            const updated = await this.get(id)
-            return this.mapMongoId(updated);
+        if (result.matchedCount > 0) {
+            return await this.get(id)
         } else {
             return null;
         }

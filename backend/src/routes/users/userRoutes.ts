@@ -1,4 +1,4 @@
-import { UserGetParamsType, UserListQueryType, UserPostBodyType, UserPutBodyType, userGetParamsSchema, userListQuerySchema, userPostBodySchema, userPutBodySchema, userResponseSchema } from "./userSchemas";
+import { UserGetParamsType, UserIdParamsType, UserListQueryType, UserPostBodyType, UserPutBodyType, userGetParamsSchema, userListQuerySchema, userPostBodySchema, userPutBodySchema, userResponseSchema } from "./userSchemas";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 async function routes (fastify: FastifyInstance) {
@@ -77,6 +77,7 @@ async function routes (fastify: FastifyInstance) {
         {
             onRequest: [fastify.authenticate],
             schema: {
+                params: userGetParamsSchema,
                 body: userPutBodySchema,
                 response: {
                     200: userResponseSchema,
@@ -90,8 +91,8 @@ async function routes (fastify: FastifyInstance) {
                 }
             }
         },
-        async (request: FastifyRequest<{Body: UserPutBodyType}>, reply: FastifyReply) => {
-            const result = await userRepository.updateOne(request.body.id, request.body)
+        async (request: FastifyRequest<{Body: UserPutBodyType, Params: UserIdParamsType}>, reply: FastifyReply) => {
+            const result = await userRepository.updateOne(request.params.userId, request.body)
             return result ? result : reply.callNotFound()
         }
     )
@@ -101,7 +102,7 @@ async function routes (fastify: FastifyInstance) {
         {
             onRequest: [fastify.authenticate],
             schema: {
-                body: userPutBodySchema,
+                params: userGetParamsSchema,
                 response: {
                     204: {
                         description: 'User deleted successfully',
@@ -117,8 +118,8 @@ async function routes (fastify: FastifyInstance) {
                 }
             }
         },
-        async (request: FastifyRequest<{Body: UserPutBodyType}>, reply: FastifyReply) => {
-            const result = await userRepository.deleteOne(request.body.id)
+        async (request: FastifyRequest<{Params: UserIdParamsType}>, reply: FastifyReply) => {
+            const result = await userRepository.deleteOne(request.params.userId)
             return result ? reply.code(204).send() : reply.callNotFound()
         }
     )

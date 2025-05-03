@@ -16,23 +16,46 @@
             </span>
         </div>
     </div>
+    <div v-if="edit">
+        <UserForm :user="user" 
+                  @cancel="onCancel"
+                  @saved="onSaved"  
+        />
+    </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
 import { type User } from '@/api/user';
+import UserForm from './UserForm.vue';
 
 export default defineComponent({
     name: 'UserListItem',
+    components: {
+        UserForm
+    },
     props: {
         user: {
             type: Object as PropType<User>,
             required: true,
         },
     },
+    emits: ['saved'],
+    data() {
+        return {
+            edit: false,
+        }
+    },
     methods: {
         onEdit() {
-            this.$emit('edit', this.user)
+            this.edit = true
+        },
+        onCancel() {
+            this.edit = false;
+        },
+        onSaved(user: User) {
+            this.$emit('saved', user);
+            this.edit = false;
         }
     }
 });

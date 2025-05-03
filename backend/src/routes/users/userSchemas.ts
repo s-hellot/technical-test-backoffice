@@ -77,3 +77,13 @@ export const userListQuerySchema = {
   } as const;
   
   export type UserListQueryType = FromSchema<typeof userListQuerySchema>;
+
+export const userIdParamsSchema = {
+    type: 'object',
+    properties: {
+        userId: { type: 'string' }
+    },
+    required: ['userId']
+} as const;
+
+export type UserIdParamsType = FromSchema<typeof userIdParamsSchema>;

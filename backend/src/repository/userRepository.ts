@@ -1,4 +1,4 @@
-import {AbstractRepository} from './abstractRepository'
+import {AbstractRepository, WithId} from './abstractRepository'
 import { IndexSpecification, CreateIndexesOptions, ObjectId, SortDirection, Sort, Filter, OptionalId} from 'mongodb'
 import { FastifyInstance } from "fastify";
 import { hashPassword } from '../utils/authUtils';
@@ -37,13 +37,13 @@ export class UserRepository extends AbstractRepository<UserDocument> {
                 password: hashedPassword,
                 firstName: 'Super',
                 lastName: 'Admin',
-                birthDate: '01/01/1970'
+                birthDate: '1970-01-01'
             });
             fastify.log.info('Default super user created');
         }
     }
 
-    public async insert(document: OptionalId<UserDocument>): Promise<Omit<UserDocument, '_id'> & { id: string; }> {
+    public async insert(document: OptionalId<UserDocument>): Promise<WithId<UserDocument> | null> {
         document.password = await hashPassword(document.password);
         return super.insert(document)
     }
@@ -52,6 +52,7 @@ export class UserRepository extends AbstractRepository<UserDocument> {
         if (document.password) {
             document.password = await hashPassword(document.password);
         }
+
         return super.updateOne(id, document)
     }
 
