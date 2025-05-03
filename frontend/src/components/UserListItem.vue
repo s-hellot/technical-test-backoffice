@@ -20,7 +20,8 @@
     <div v-if="edit">
         <UserForm :user="user" 
                   @cancel="onCancel"
-                  @saved="onSaved"  
+                  @saved="onSaved"
+                  @deleted="onDeleted"  
         />
     </div>
 </template>
@@ -41,7 +42,7 @@ export default defineComponent({
             required: true,
         },
     },
-    emits: ['saved'],
+    emits: ['saved', 'deleted'],
     data() {
         return {
             edit: false,
@@ -55,8 +56,12 @@ export default defineComponent({
             this.edit = false;
         },
         onSaved(user: User) {
-            this.$emit('saved', user);
             this.edit = false;
+            this.$emit('saved', user);
+        },
+        onDeleted() {
+            this.edit = false;
+            this.$emit('deleted')
         }
     }
 });

@@ -35,7 +35,10 @@
              class="my-3 rounded bg-white"
              :class="{'loading': loadingUsers}"
         >
-            <UserListItem :user="user" @saved="onSaved" />
+            <UserListItem :user="user" 
+                @saved="onSaved" 
+                @deleted="onDeleted"
+            />
         </div>
     </div>
 </template>
@@ -93,8 +96,11 @@ export default {
             }
         },
         async onCreated() {
-            await this.loadUsers()
             this.displayNewForm = false
+            await this.loadUsers()
+        },
+        async onDeleted() {
+            await this.loadUsers()
         },
         toggleNewForm() {
             this.displayNewForm = !this.displayNewForm

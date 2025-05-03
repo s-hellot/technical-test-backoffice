@@ -35,7 +35,7 @@
             </div>
 
             <div class="pt-4 d-flex">
-                <button class="btn btn-dark ml-auto" @click="onLogin"> Valider </button>
+                <button class="btn btn-dark ms-auto" @click="onLogin"> Valider </button>
             </div>
 
         </div>

@@ -1,6 +1,6 @@
 <template>
     <div class="m-3"
-         :class="{'loading': loadingSave}"
+         :class="{'loading': loadingSave || loadingDelete}"
     >
         <div class="d-flex">
             <div class="mb-3 flex-grow-1">
@@ -82,19 +82,26 @@
 
         <div class="d-flex justify-content-end">
             <div class="d-flex  ml-auto">
-                <button v-if="edit" class="btn btn-danger" @click="onDelete"> Supprimer </button>
+                <ConfirmButton 
+                    v-if="edit" 
+                    :loading="loadingDelete"
+                    @confirm="onDelete"
+                />
                 <button v-if="!edit" class="btn btn-danger" @click="onCancel"> Annuler </button>
-                <button class="btn btn-dark ml-3" @click="onSubmit">
-                    <div v-if="loadingSave">
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        Loading...
-                    </div>
-                    <div v-else>
-                        Sauvegarder
-                    </div>
-                </button>
+                <div>
+                    <button class="btn btn-dark ml-3" :disabled="loadingSave" @click="onSubmit">
+                        <div v-if="loadingSave">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Chargement...
+                        </div>
+                        <div v-else>
+                            Sauvegarder
+                        </div>
+                    </button>
+                </div>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -103,19 +110,23 @@ import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
 import type { NewUser, User } from '@/api/user';
 import useVuelidate from '@vuelidate/core'
-import { updateUser, createUser } from '../api/user'
+import { updateUser, createUser, deleteUser } from '../api/user'
 import type { AxiosResponse } from 'axios';
 import { required, email, minLength } from '@vuelidate/validators'
+import ConfirmButton from './ConfirmButton.vue';
 
 export default defineComponent({
     name: 'UserForm',
+    components: {
+        ConfirmButton
+    },
     props: {
         user: {
             type: Object as PropType<User>,
             required: false,
         },
     },
-    emits: ['cancel', 'saved', 'delete'],
+    emits: ['cancel', 'saved', 'deleted'],
     setup() {
         return { v$: useVuelidate() }
     },
@@ -129,7 +140,8 @@ export default defineComponent({
                 password: ''
             } as NewUser,
             edit: false,
-            loadingSave: false
+            loadingSave: false,
+            loadingDelete: false
         };
     },
     validations() {
@@ -146,15 +158,21 @@ export default defineComponent({
         }
     },
     mounted() {
-        if (this.user) {
+        if (this.user && this.user.id) {
             // should use clone
             this.newUser = { ...this.user };
             this.edit = true
         }
     },
     methods: {
-        onDelete() {
-
+        async onDelete() {
+            try {
+                this.loadingDelete = true
+                await deleteUser(this.user!.id!)
+                this.$emit('deleted')
+            } finally {
+                this.loadingDelete = false
+            }
         },
         onCancel() {
             this.$emit('cancel')
