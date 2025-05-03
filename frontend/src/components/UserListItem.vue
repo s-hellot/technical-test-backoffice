@@ -10,9 +10,10 @@
         <div class="ml-auto d-flex align-items-center">
             <span class="icon-edit text-primary" 
                   style="cursor: pointer;"
-                  @click="onEdit"
+                  @click="toggleEdit"
             >
-                <i class="bi bi-pencil-fill" style="font-size:32px"></i>
+                <i v-if ="!edit" class="bi bi-pencil-fill" style="font-size:32px"></i>
+                <i v-else class="bi bi-x-circle" style="font-size:32px"></i>
             </span>
         </div>
     </div>
@@ -47,8 +48,8 @@ export default defineComponent({
         }
     },
     methods: {
-        onEdit() {
-            this.edit = true
+        toggleEdit() {
+            this.edit = !this.edit
         },
         onCancel() {
             this.edit = false;

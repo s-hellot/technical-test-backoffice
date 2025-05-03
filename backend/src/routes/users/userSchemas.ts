@@ -7,7 +7,7 @@ export const userResponseSchema = {
         firstName: { type: 'string' },
         lastName: { type: 'string' },
         email: { type: 'string' },
-        birthDate: { type: 'string' }
+        birthDate: { type: 'string' },
     },
     required: ['id', 'firstName', 'lastName', 'email', 'birthDate'],
     additionalProperties: false

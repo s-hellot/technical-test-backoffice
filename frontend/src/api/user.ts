@@ -5,14 +5,26 @@ export interface User {
     firstName: string,
     lastName: string,
     email: string,
-    birthDate: string
+    birthDate: string,
 }
 
-export const getUsers = () => api.get<Array<User>>('/users')
+export interface NewUser extends User {
+    password?: string
+}
+
+export const getUsers = (search?: string, sortBy?: string, sortOrder?: 'asc' | 'desc') => {
+    return api.get<Array<User>>('/users', {
+        params: {
+            search,
+            sortBy,
+            sortOrder
+        }
+    })
+}
 
 export const getUserById = (id: string) => api.get<User>(`/users/${id}`)
 
-export const createUser = (user: User) => api.post<User>(`/users`, user)
+export const createUser = (user: NewUser) => api.post<User>(`/users`, user)
 
 export const updateUser = (id: string, user: Partial<User>) => api.put<User>(`/users/${id}`, user)
   

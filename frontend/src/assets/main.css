@@ -20,3 +20,7 @@ a,
   letter-spacing: 0.5px; /* Subtle letter spacing for clarity */
   margin-bottom: 1rem;
 }
+
+.loading {
+  opacity: 0.5
+}

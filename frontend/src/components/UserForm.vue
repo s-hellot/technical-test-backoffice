@@ -1,5 +1,7 @@
 <template>
-    <div class="m-3">
+    <div class="m-3"
+         :class="{'loading': loadingSave}"
+    >
         <div class="d-flex">
             <div class="mb-3 flex-grow-1">
                 <label for="firstName" class="form-label">Prénom</label>
@@ -59,9 +61,29 @@
             </div>
         </div>
 
+        <div class="d-flex">
+            <div class="mb-3 flex-grow-1">
+                <label for="password" class="form-label">Nouveau mot de passe</label>
+                <div>
+                    <input 
+                        id="password" 
+                        v-model="newUser.password" 
+                        type="password" 
+                        class="form-control"
+                        :class="{ 'is-invalid': v$.newUser.password.$error }" 
+                        placeholder="Renseignez votre mot de passe" 
+                    />
+                    <div v-if="v$.newUser.password.$error" class="invalid-feedback">
+                        Veuillez renseigner un mot de passe d'au moins 6 caractères.
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="d-flex justify-content-end">
             <div class="d-flex  ml-auto">
-                <button class="btn btn-danger" @click="onCancel"> Annuler </button>
+                <button v-if="edit" class="btn btn-danger" @click="onDelete"> Supprimer </button>
+                <button v-if="!edit" class="btn btn-danger" @click="onCancel"> Annuler </button>
                 <button class="btn btn-dark ml-3" @click="onSubmit">
                     <div v-if="loadingSave">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -79,11 +101,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
-import type { User } from '@/api/user';
+import type { NewUser, User } from '@/api/user';
 import useVuelidate from '@vuelidate/core'
 import { updateUser, createUser } from '../api/user'
 import type { AxiosResponse } from 'axios';
-import { required, email } from '@vuelidate/validators'
+import { required, email, minLength } from '@vuelidate/validators'
 
 export default defineComponent({
     name: 'UserForm',
@@ -93,7 +115,7 @@ export default defineComponent({
             required: false,
         },
     },
-    emits: ['cancel', 'saved'],
+    emits: ['cancel', 'saved', 'delete'],
     setup() {
         return { v$: useVuelidate() }
     },
@@ -104,7 +126,8 @@ export default defineComponent({
                 lastName: '',
                 email: '',
                 birthDate: '',
-            } as User,
+                password: ''
+            } as NewUser,
             edit: false,
             loadingSave: false
         };
@@ -116,7 +139,10 @@ export default defineComponent({
                 lastName: { required },
                 email: { required, email },
                 birthDate: { required },
-            },
+                password: this.edit
+                    ? { minLength: minLength(6) }
+                    : { required, minLength: minLength(6) }
+            },            
         }
     },
     mounted() {
@@ -127,6 +153,9 @@ export default defineComponent({
         }
     },
     methods: {
+        onDelete() {
+
+        },
         onCancel() {
             this.$emit('cancel')
         },
