@@ -1,6 +1,8 @@
 <template>
     <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-        <div class="bg-white p-5 rounded d-flex flex-column mx-auto" style="width: 600px">
+        <div class="bg-white p-5 rounded d-flex flex-column mx-auto" style="width: 600px"
+             :class="{'loading': loading}"
+        >
             <h1 class="title text-center mb-4">Se connecter </h1>
 
             <div v-if="loginFailed" class="d-flex justify-content-center invalid-feedback">
@@ -20,13 +22,9 @@
             <div class="pt-2">
                 <label for="password" class="form-label">Mot de passe</label>
                 <div>
-                    <input 
-                        id="password" 
-                        v-model="password" 
-                        type="password" 
-                        class="form-control"
-                        :class="{ 'is-invalid': passwordHasError || loginFailed }" 
-                        placeholder="Renseignez votre mot de passe" 
+                    <PasswordInput v-model="password"
+                                   :error="passwordHasError || loginFailed"
+                                   :class="{ 'is-invalid': passwordHasError }" 
                     />
                     <div v-if="passwordHasError" class="invalid-feedback">
                         Veuillez renseigner un mot de passe.
@@ -35,13 +33,24 @@
             </div>
 
             <div class="mt-2 d-flex justify-content-center">
-                <div class="text-muted">
-                    Utilisez admin@admin.com / admin pour vous connecter.
+                <div class="text-muted text-center">
+                    Utilisez admin@admin.com / admin pour vous connecter la première fois.
                 </div>
             </div>
 
             <div class="pt-4 d-flex">
-                <button class="btn btn-dark ml-auto" @click="onLogin"> Valider </button>
+                <button class="btn btn-dark ml-auto" 
+                        :disabled="loading"
+                        @click="onLogin"
+                > 
+                    <div v-if="loading">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Chargement...
+                    </div>
+                    <div v-else>
+                        Valider 
+                    </div>
+                </button>
             </div>
 
         </div>
@@ -52,9 +61,13 @@
 import useVuelidate from '@vuelidate/core'
 import { required, email } from '@vuelidate/validators'
 import { login } from '../api/auth'
+import PasswordInput from '@/components/PasswordInput.vue'
 
 export default {
     name: 'LoginPage',
+    components: {
+        PasswordInput
+    },
     setup() {
         return { v$: useVuelidate() }
     },
@@ -62,7 +75,8 @@ export default {
         return {
             email: '',
             password: '',
-            loginFailed: false
+            loginFailed: false,
+            loading: false
         }
     },
     validations() {
@@ -88,12 +102,15 @@ export default {
         },
         async handleLogin() {
             try {
+                this.loading = true
                 const { data } = await login({ email: this.email, password: this.password })
                 localStorage.setItem('token', data.token)
                 this.$router.push('/users')
                 this.loginFailed = false
             } catch (e) {
                 this.loginFailed = true
+            } finally {
+                this.loading = false
             }
         }
     },

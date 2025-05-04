@@ -66,25 +66,11 @@
         <div class="d-flex">
             <div class="mb-3 flex-grow-1">
                 <label for="password" class="form-label">Nouveau mot de passe</label>
-                <div class="d-flex"
+                <PasswordInput
+                    v-model="newUser.password"
+                    :error="v$.newUser.password.$error"
                     :class="{ 'is-invalid': v$.newUser.password.$error }" 
-                >
-                    <input 
-                        id="password" 
-                        v-model="newUser.password" 
-                        :type="showPassword ? 'text' : 'password'" 
-                        class="form-control"
-                        :class="{ 'is-invalid': v$.newUser.password.$error }" 
-                        placeholder="Renseignez votre mot de passe" 
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-outline-secondary position-relative ml-3"
-                        @click="togglePassword"
-                    >
-                        <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                    </button>
-                </div>
+                />
                 <div v-if="v$.newUser.password.$error" class="invalid-feedback">
                     Veuillez renseigner un mot de passe d'au moins 6 caractères.
                 </div>
@@ -125,11 +111,13 @@ import { updateUser, createUser, deleteUser } from '../api/user'
 import type { AxiosResponse } from 'axios';
 import { required, email, minLength, helpers } from '@vuelidate/validators'
 import ConfirmButton from './ConfirmButton.vue';
+import PasswordInput from './PasswordInput.vue';
 
 export default defineComponent({
     name: 'UserForm',
     components: {
-        ConfirmButton
+        ConfirmButton,
+        PasswordInput
     },
     props: {
         user: {
@@ -172,8 +160,8 @@ export default defineComponent({
                     }),
                 },
                 password: this.edit
-                    ? { minLength: minLength(6) }
-                    : { required, minLength: minLength(6) }
+                    ? { minLength: minLength(5) }
+                    : { required, minLength: minLength(5) }
             },            
         }
     },

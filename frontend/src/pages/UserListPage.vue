@@ -114,7 +114,7 @@ export default {
             }
             this.searchTimeout = setTimeout(async () => {
                 await this.loadUsers()
-            }, 1500)
+            }, 1000)
         },
         async onCreated() {
             this.displayNewForm = false
